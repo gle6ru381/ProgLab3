@@ -1,0 +1,4 @@
+build/*.o
+bin/coder*
+bin/*.bin
+bin/*.txt
