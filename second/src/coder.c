@@ -20,7 +20,7 @@ int encode(uint32_t value, CodeUnits* codeUnits)
         codeUnits->code[0] = byte3 | 0xE0;
         codeUnits->code[1] = byte2 | 0x80;
         codeUnits->code[2] = byte1 | 0x80;
-    } else {
+    } else if (value < 1114112) {
         codeUnits->length = 4;
         uint8_t byte1 = value % 64;
         uint8_t byte2 = ((value - byte1) / 64) % 64;
@@ -31,7 +31,8 @@ int encode(uint32_t value, CodeUnits* codeUnits)
         codeUnits->code[1] = byte3 | 0x80;
         codeUnits->code[2] = byte2 | 0x80;
         codeUnits->code[3] = byte3 | 0x80;
-    }
+    } else
+        return -1;
     return 0;
 }
 
@@ -66,8 +67,12 @@ int read_next_code_unit(FILE* fin, CodeUnits* codeUnits)
         codeUnits->length = 3;
     } else if ((byte & 0xC0) == 0xC0) {
         codeUnits->length = 2;
-    } else
+    } else if ((byte | 0x80) != byte) {
         codeUnits->length = 1;
+    } else {
+        codeUnits->length = 0;
+        return 0;
+    }
 
     codeUnits->code[0] = byte;
     if (codeUnits->length != 1) {
@@ -76,5 +81,13 @@ int read_next_code_unit(FILE* fin, CodeUnits* codeUnits)
                    codeUnits->length - 1,
                    fin))
             return -1;
+        for (int i = 1; i < codeUnits->length; i++) {
+            if (((codeUnits->code[i] | 0x40) == codeUnits->code[i])
+                || (codeUnits->code[i] | 0x80) != codeUnits->code[i]) {
+                codeUnits->length = 0;
+                return 0;
+            }
+        }
     }
+    return 0;
 }
