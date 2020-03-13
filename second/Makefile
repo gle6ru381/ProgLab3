@@ -1,8 +1,8 @@
 coder: $(patsubst src/%.c, build/%.o,$(wildcard src/*.c))
-	gcc $^ -o bin/$@
+	gcc $^ -g3 -o bin/$@
 
 build/%.o: src/%.c
-	gcc -o $@ -c $<
+	gcc -o $@ -g3 -c $<
 
 clean:
-	rm src/*.o
+	rm build/*.o

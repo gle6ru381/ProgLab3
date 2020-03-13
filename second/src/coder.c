@@ -24,15 +24,14 @@ int encode(uint32_t value, CodeUnits* codeUnits)
         codeUnits->length = 4;
         uint8_t byte1 = value % 64;
         uint8_t byte2 = ((value - byte1) / 64) % 64;
-        uint8_t byte3 = (value - byte1 - (byte2 * 64)) % 64;
+        uint8_t byte3 = ((value - byte1 - (byte2 * 64)) / (64 * 64)) % 64;
         uint8_t byte4 = (value - byte1 - (byte2 * 64) - (byte3 * 64 * 64))
                 / (64 * 64 * 64);
         codeUnits->code[0] = byte4 | 0xF0;
         codeUnits->code[1] = byte3 | 0x80;
         codeUnits->code[2] = byte2 | 0x80;
-        codeUnits->code[3] = byte3 | 0x80;
-    } else
-        return -1;
+        codeUnits->code[3] = byte1 | 0x80;
+    }
     return 0;
 }
 

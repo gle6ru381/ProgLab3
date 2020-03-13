@@ -14,12 +14,12 @@ int main(int argc, char** argv)
         print_error();
         return -1;
     }
-    if (strcmp(argv[1], "encode")) {
+    if (!strcmp(argv[1], "encode")) {
         if (encode_file(argv[2], argv[3])) {
             print_error();
             return -1;
         }
-    } else if (strcmp(argv[1], "decode")) {
+    } else if (!strcmp(argv[1], "decode")) {
         if (decode_file(argv[2], argv[3])) {
             print_error();
             return -1;
